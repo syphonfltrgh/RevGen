@@ -5,5 +5,5 @@ simple reverse shell generator
 chmod +x revgen.py
 sudo mv revgen.py /usr/local/bin/revgen
 
-# You can now execute revgen simply by typing revgen
+You can now execute revgen simply by typing revgen
 
